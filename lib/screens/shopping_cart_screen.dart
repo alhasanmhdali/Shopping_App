@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/order.dart';
+
+import '../providers/order.dart';
 
 import '../widgets/cart_list_item.dart';
 
@@ -39,18 +40,14 @@ class ShoppingCartScreen extends StatelessWidget {
                         count <= 1 ? '$count item' : '$count items',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Theme
-                              .of(context)
-                              .primaryColor,
+                          color: Theme.of(context).primaryColor,
                         ),
                       );
                     },
                   ),
                   const SizedBox(width: 10),
                   Chip(
-                    backgroundColor: Theme
-                        .of(context)
-                        .primaryColor,
+                    backgroundColor: Theme.of(context).primaryColor,
                     label: Consumer<Cart>(
                       builder: (ctx, cart, _) =>
                           Text('\$${cart.getTotalPrice.toStringAsFixed(2)}'),
@@ -67,17 +64,18 @@ class ShoppingCartScreen extends StatelessWidget {
             child: FlatButton.icon(
               onPressed: () {
                 Cart cart = Provider.of<Cart>(context, listen: false);
-                Provider.of<Order>(context, listen: false).addOrder(cart.getTotalPrice, cart.cartItems.values.toList());
-                cart.clear();
+                if (cart.getCount > 0) {
+                  Provider.of<Order>(context, listen: false).addOrder(
+                      cart.getTotalPrice, cart.cartItems.values.toList());
+                  cart.clear();
+                }
               },
               icon: Icon(Icons.shopping_basket),
               label: Text(
                 'Checkout',
                 style: TextStyle(fontSize: 18),
               ),
-              textColor: Theme
-                  .of(context)
-                  .primaryColor,
+              textColor: Theme.of(context).primaryColor,
             ),
           ),
           Expanded(

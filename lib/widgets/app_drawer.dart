@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screens/user_products.dart';
 import '../screens/orders_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -21,9 +22,8 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontSize: 18),
             ),
             onTap: () {
-              if (currentRoute == '/')
-                Navigator.of(context).pop();
-              else
+              Navigator.of(context).pop();
+              if (currentRoute != '/')
                 Navigator.of(context).pushReplacementNamed('/');
             },
           ),
@@ -36,11 +36,29 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(fontSize: 18),
             ),
             onTap: () {
-              if (currentRoute == OrdersScreen.routeName)
-                Navigator.of(context).pop();
-              else
-                Navigator.of(context)
-                    .pushReplacementNamed(OrdersScreen.routeName);
+              Navigator.of(context).pop();
+              if (currentRoute != OrdersScreen.routeName)
+                currentRoute == '/'
+                    ? Navigator.of(context).pushNamed(OrdersScreen.routeName)
+                    : Navigator.of(context)
+                        .pushReplacementNamed(OrdersScreen.routeName);
+            },
+          ),
+          Divider(),
+          ListTile(
+            selected: currentRoute == UserProducts.routeName,
+            leading: Icon(Icons.category),
+            title: Text(
+              'Products',
+              style: TextStyle(fontSize: 18),
+            ),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (currentRoute != UserProducts.routeName)
+                currentRoute == '/'
+                    ? Navigator.of(context).pushNamed(UserProducts.routeName)
+                    : Navigator.of(context)
+                        .pushReplacementNamed(UserProducts.routeName);
             },
           ),
           Divider(),

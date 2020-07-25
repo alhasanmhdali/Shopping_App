@@ -39,7 +39,7 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   List<Product> get items {
-    return [..._items];
+    return _items;
   }
 
   List<Product> get favItems {
@@ -56,6 +56,16 @@ class ProductsProvider with ChangeNotifier {
   }
 
   void favUpdated() {
+    notifyListeners();
+  }
+
+  void removeProduct(String id){
+    _items.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+
+  void editProduct(Product prd){
+    _items[_items.indexWhere((element) => element.id == prd.id)] = prd;
     notifyListeners();
   }
 }

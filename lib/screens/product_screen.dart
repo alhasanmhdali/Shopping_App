@@ -158,8 +158,7 @@ class ProductScreen extends StatelessWidget {
                                     SizedBox(width: 20),
                                     IconButton(
                                       icon: Icon(Icons.keyboard_arrow_up),
-                                      onPressed: () => cart.addItem(product.id,
-                                          product.title, product.price),
+                                      onPressed: () => cart.addItem(product),
                                     ),
                                   ],
                                 ),

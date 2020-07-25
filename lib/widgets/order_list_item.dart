@@ -27,7 +27,7 @@ class _OrderListItemState extends State<OrderListItem> {
               style: TextStyle(fontSize: 18),
             ),
             subtitle: Text(
-              '\$${widget.order.amount}',
+              '\$${widget.order.amount.toStringAsFixed(2)}',
             ),
             trailing: IconButton(
               icon: Icon(!_expanded ? Icons.expand_more : Icons.expand_less),
@@ -51,14 +51,14 @@ class _OrderListItemState extends State<OrderListItem> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            prod.item,
+                            prod.product.title,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            '${prod.quantity} x    \$${prod.price}',
+                            '${prod.quantity} x    \$${prod.product.price}',
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.grey,

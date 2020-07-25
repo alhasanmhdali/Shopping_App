@@ -13,6 +13,32 @@ class CartListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
+      confirmDismiss: (_) {
+        return showDialog<bool>(
+          context: context,
+          builder: (ctx) {
+            return AlertDialog(
+              title: Text('Confirm Delete'),
+              content: Text(
+                  'Are you sure you want to remove \"${_cartItem.product.title}\" from your cart?'),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                  child: Text('Yes'),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                  child: Text('No'),
+                ),
+              ],
+            );
+          },
+        );
+      },
       key: ValueKey(_cartItem.id),
       direction: DismissDirection.endToStart,
       background: Card(
@@ -30,12 +56,27 @@ class CartListItem extends StatelessWidget {
             )),
       ),
       onDismissed: (_) {
-        Provider.of<Cart>(context, listen: false).removeItem(_cartItem.product);
+        final String id = _cartItem.product.id;
+        final String title = _cartItem.product.title;
+        final int quantity = _cartItem.quantity;
+        final cart = Provider.of<Cart>(context, listen: false);
+        cart.removeItem(id);
+        Scaffold.of(context).hideCurrentSnackBar();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('\"$title\" has been removed from your cart!'),
+          action: SnackBarAction(
+            label: 'undo',
+            onPressed: () {
+              cart.addItem(_cartItem.product, quantity: quantity);
+            },
+          ),
+          duration: Duration(seconds: 5),
+        ));
       },
       child: InkWell(
         onTap: () {
-          Navigator.of(context)
-              .pushNamed(ProductScreen.routeName, arguments: _cartItem.product);
+          Navigator.of(context).pushNamed(ProductScreen.routeName,
+              arguments: _cartItem.product.id);
         },
         splashColor: Theme.of(context).primaryColor,
         child: Card(
@@ -51,7 +92,7 @@ class CartListItem extends StatelessWidget {
                     padding: EdgeInsets.all(5),
                     child: FittedBox(
                       child: Text(
-                          '\$${(_cartItem.price * _cartItem.quantity).round()}'),
+                          '\$${(_cartItem.product.price * _cartItem.quantity).round()}'),
                     ),
                   ),
                 ),
@@ -64,7 +105,7 @@ class CartListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _cartItem.item,
+                        _cartItem.product.title,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -74,7 +115,7 @@ class CartListItem extends StatelessWidget {
                         height: 5,
                       ),
                       Text(
-                        '\$${_cartItem.price} each',
+                        '\$${_cartItem.product.price} each',
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
@@ -87,7 +128,7 @@ class CartListItem extends StatelessWidget {
                       onPressed: (_cartItem.quantity == 1)
                           ? null
                           : () => Provider.of<Cart>(context, listen: false)
-                              .updateQuantity(_cartItem.product, 'remove'),
+                              .updateQuantity(_cartItem.product.id, 'remove'),
                       icon: Icon(
                         Icons.remove,
                         size: 18,
@@ -101,7 +142,7 @@ class CartListItem extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () => Provider.of<Cart>(context, listen: false)
-                          .updateQuantity(_cartItem.product, 'add'),
+                          .updateQuantity(_cartItem.product.id, 'add'),
                       icon: Icon(
                         Icons.add,
                         size: 18,

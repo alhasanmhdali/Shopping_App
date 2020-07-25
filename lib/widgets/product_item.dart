@@ -45,10 +45,21 @@ class ProductItem extends StatelessWidget {
               product.favoritePressed();
               Provider.of<ProductsProvider>(context, listen: false)
                   .favUpdated();
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text(product.isFavorite
+                    ? '\"${product.title}\" added to favorite!'
+                    : '\"${product.title}\" removed from favorite!'),
+                action: SnackBarAction(
+                  label: 'Undo',
+                  onPressed: () {
+                    product.favoritePressed();
+                    Scaffold.of(context).hideCurrentSnackBar();
+                  },
+                ),
+              ));
             },
-            color: Theme
-                .of(context)
-                .accentColor,
+            color: Theme.of(context).accentColor,
           ),
           title: Text(
             product.title,
@@ -59,20 +70,47 @@ class ProductItem extends StatelessWidget {
               int count = cart.getItemCount(product.id);
               Widget shopIcon = IconButton(
                 icon: Icon(Icons.add_shopping_cart),
-                onPressed: () =>
-                    cart.addItem(product.id, product.title, product.price),
-                color: Theme
-                    .of(context)
-                    .accentColor,
+                onPressed: () {
+                  cart.addItem(product);
+                  Scaffold.of(context).hideCurrentSnackBar();
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        '\"${product.title}\" has been added to your cart!'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        cart.updateQuantity(product.id, 'remove');
+                        Scaffold.of(context).hideCurrentSnackBar();
+                      },
+                    ),
+                  ));
+                },
+                color: Theme.of(context).accentColor,
               );
-              return count == 0 ? shopIcon : GestureDetector(
-                onLongPress: () => cart.removeItem(product.id),
-                child: Badge(
-                  value: count.toString(),
-                  color: Colors.white,
-                  child: shopIcon,
-                ),
-              );
+              return count == 0
+                  ? shopIcon
+                  : GestureDetector(
+                      onLongPress: () {
+                        final int count = cart.getItemCount(product.id);
+                        cart.removeItem(product.id);
+                        Scaffold.of(context).hideCurrentSnackBar();
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text('$count \"${product.title}\" has been removed from your cart!'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () {
+                              cart.addItem(product, quantity: count);
+                              Scaffold.of(context).hideCurrentSnackBar();
+                            },
+                          ),
+                        ));
+                      },
+                      child: Badge(
+                        value: count.toString(),
+                        color: Colors.white,
+                        child: shopIcon,
+                      ),
+                    );
             },
           ),
         ),
